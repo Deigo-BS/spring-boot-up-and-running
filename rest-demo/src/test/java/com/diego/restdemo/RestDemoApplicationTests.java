@@ -1,4 +1,4 @@
-package com.diego.rest_demo;
+package com.diego.restdemo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
