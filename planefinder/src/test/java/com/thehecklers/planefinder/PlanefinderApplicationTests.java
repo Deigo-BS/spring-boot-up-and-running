@@ -1,10 +1,10 @@
-package com.diego.restdemo;
+package com.thehecklers.planefinder;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RestDemoApplicationTests {
+class PlanefinderApplicationTests {
 
 	@Test
 	void contextLoads() {
