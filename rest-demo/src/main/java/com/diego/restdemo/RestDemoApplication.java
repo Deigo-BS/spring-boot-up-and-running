@@ -3,8 +3,12 @@ package com.diego.restdemo;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +20,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class RestDemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RestDemoApplication.class, args);
 	}
+
+    //to wrap third-party components and incorporate their properties into the application's Environment .
+    @Bean
+    @ConfigurationProperties(prefix = "droid")
+    public Droid createDroid(){
+        return new Droid();
+    }
 
 }
 
@@ -47,6 +59,65 @@ class DataLoader{
 
 
 @RestController
+@RequestMapping("/droid")
+class DroidController{
+    private final Droid droid;
+    public DroidController(Droid droid){
+        this.droid = droid;
+    }
+
+    @GetMapping
+    public Droid getDroid(){
+        return droid;
+    }
+}
+
+@RestController
+@RequestMapping("/greeting")
+class GreetingController{
+
+    //Usando @Value ------------------------------------------------------------------------------------------------------------------------
+
+/*    @Value("${greeting-name: Ramirín}")     //De esta manera establecemos un nombre default si la propiedad no esta definida
+    private String name;
+
+    @Value("${greeting-coffee: ${greeting-name} is drinking Café Ganador}")
+    private String coffee;
+
+    @GetMapping
+    public String getGreeting(){
+        return name;
+    }
+
+    @GetMapping("/coffee")
+    public String getNameAndCoffee(){
+        return coffee;
+    }*/
+
+    /*NOTA: con @Value nombramos nuestras porperties como greeting-name y no hubo problemas
+    * al crearlas con @ConfigurationProperties(prefix = "greeting") estas deben de ir con "." greeting.name*/
+
+    //Usando @ConfigurationProperties(prefix = "greeting") ------------------------------------------------------------------------------
+
+    private final Greeting greeting;
+    public GreetingController(Greeting greeting){
+        this.greeting = greeting;
+    }
+
+    @GetMapping
+    public String getGreeting(){
+        return greeting.getName();
+    }
+
+    @GetMapping("/coffee")
+    public String getNameAndCoffee(){
+        return greeting.getCoffee();
+    }
+
+}
+
+
+@RestController
 @RequestMapping("/coffees")     //I'll elevate the portion of the URI mapping that is common to all methods
 class RestApiDemoController{
 
@@ -54,14 +125,6 @@ class RestApiDemoController{
 
     public RestApiDemoController(CoffeeRepository coffeeRepository){
         this.coffeeRepository = coffeeRepository;
-
-        //Esto lo cambio a otro modulo (aqui arribita)
-/*        this.coffeeRepository.saveAll(List.of(
-                new Coffee("Café Cereza"),
-                new Coffee("Café Ganador"),
-                new Coffee("Café Lareño"),
-                new Coffee("Café Tres Pontas")));*/
-
     }
 
 
@@ -100,6 +163,50 @@ class RestApiDemoController{
     @DeleteMapping("/{id}")
     public void deleteCoffee(@PathVariable String id){
         coffeeRepository.deleteById(id);
+    }
+}
+
+
+class Droid{
+    private String id, description;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+
+
+@ConfigurationProperties(prefix = "greeting")
+class Greeting{
+    private String name;
+    private String coffee;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCoffee() {
+        return coffee;
+    }
+
+    public void setCoffee(String coffee) {
+        this.coffee = coffee;
     }
 }
 
