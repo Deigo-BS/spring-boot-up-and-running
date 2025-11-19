@@ -1,1 +1,0 @@
-INSERT INTO student (id, name, last_name) VALUES (student_seq.nextval, 'Diego', 'Brito');
