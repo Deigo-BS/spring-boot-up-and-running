@@ -28,12 +28,11 @@ public class PlaneFinderService {
         om = new ObjectMapper();
     }
 
-    public Iterable<Aircraft> getAircraft() throws IOException {
+    public Iterable<Aircraft> getAircraft() {
         List<Aircraft> positions = new ArrayList<>();
 
-        JsonNode aircraftNodes = null;
         try {
-            aircraftNodes = om.readTree(acURL)
+            JsonNode aircraftNodes = om.readTree(acURL)
                     .get("aircraft");
 
             aircraftNodes.iterator().forEachRemaining(node -> {
